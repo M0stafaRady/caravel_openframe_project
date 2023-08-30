@@ -1,7 +1,7 @@
 from caravel_cocotb.caravel_interfaces import test_configure
 from caravel_cocotb.caravel_interfaces import report_test
 import cocotb
-from cocotb.triggers import ClockCycles
+from cocotb.triggers import ClockCycles, NextTimeStep
 from openframe import OpenFrame, OpenFrameUART
 import random
 from all_tests.spi_master.spi_slave import SPISlave
@@ -15,6 +15,7 @@ async def spi_master(dut):
     spi_slave = SPISlave(miso=dut.gpio10, mosi=dut.gpio11_monitor, sclk=dut.gpio9_monitor, cs=dut.gpio8_monitor)
     first_slave = await cocotb.start(spi_slave.start())    
     await openframe.wait_any_change_reg2()
+    await NextTimeStep()
     if openframe.read_debug_reg2() == 0xE0:
         cocotb.log.error(f"[TEST] Read wrong value {hex(openframe.read_debug_reg1())} at the first phase")  
     elif openframe.read_debug_reg2() == 0xA0:
